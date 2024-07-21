@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Projectile.h"
 
 // Sets default values
 ATankBasePawn::ATankBasePawn()
@@ -37,5 +38,14 @@ void ATankBasePawn::RotateTurret(FVector LookAtTarget)
 			LookAtRotation, 
 			UGameplayStatics::GetWorldDeltaSeconds(this), 
 			5.f));
+}
+
+void ATankBasePawn::Fire()
+{
+	FVector Location = ProjectileSpawnPoint->GetComponentLocation();
+	FRotator Rotation = ProjectileSpawnPoint->GetComponentRotation();
+
+	GetWorld()->SpawnActor<AProjectile>(ProjectileClass, Location, Rotation);
+	
 }
 
