@@ -16,18 +16,20 @@ public:
 	ATankBasePawn();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+
+	void RotateTurret(FVector LookAtTarget);
 
 private:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	class UCapsuleComponent* CapsuleComp;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* BaseMesh;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* TurretMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* ProjectileSpawnPoint;
 
 };

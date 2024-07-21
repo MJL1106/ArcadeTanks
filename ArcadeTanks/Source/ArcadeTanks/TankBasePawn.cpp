@@ -2,6 +2,9 @@
 
 
 #include "TankBasePawn.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ATankBasePawn::ATankBasePawn()
@@ -9,26 +12,30 @@ ATankBasePawn::ATankBasePawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-}
+	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
+	RootComponent = CapsuleComp;
 
-// Called when the game starts or when spawned
-void ATankBasePawn::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
+	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
+	BaseMesh->SetupAttachment(CapsuleComp);
 
-// Called every frame
-void ATankBasePawn::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret Mesh"));
+	TurretMesh->SetupAttachment(BaseMesh);
+
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn Point"));
+	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
 
 }
 
-// Called to bind functionality to input
-void ATankBasePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ATankBasePawn::RotateTurret(FVector LookAtTarget)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	FVector ToTarget = LookAtTarget - TurretMesh->GetComponentLocation();
+	FRotator LookAtRotation = FRotator(0.f, ToTarget.Rotation().Yaw, 0.f);
 
+	TurretMesh->SetWorldRotation(
+		FMath::RInterpTo(
+			TurretMesh->GetComponentRotation(), 
+			LookAtRotation, 
+			UGameplayStatics::GetWorldDeltaSeconds(this), 
+			5.f));
 }
 
