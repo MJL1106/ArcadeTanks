@@ -24,6 +24,26 @@ void ATankController::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ATankController::Turn);
 }
 
+// Called every frame
+void ATankController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (PlayerControllerRef)
+	{
+		FHitResult HitResult;
+		PlayerControllerRef->GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, false, HitResult);
+		RotateTurret(HitResult.ImpactPoint);
+	}
+}
+
+void ATankController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	PlayerControllerRef = Cast<APlayerController>(GetController());
+}
+
 void ATankController::Move(float Value) 
 {
 	FVector DeltaLocation = FVector::ZeroVector;
