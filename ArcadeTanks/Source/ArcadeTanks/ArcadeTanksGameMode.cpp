@@ -27,7 +27,32 @@ void AArcadeTanksGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Tank = Cast<ATankController>(UGameplayStatics::GetPlayerPawn(this, 0));
+	HandleGameStart();
+}
 
-	ArcadeTanksPlayerController = Cast<AArcadeTanksPlayerController>(UGameplayStatics::GetPlayerCameraManager(this, 0));
+void AArcadeTanksGameMode::HandleGameStart()
+{
+	Tank = Cast<ATankController>(UGameplayStatics::GetPlayerPawn(this, 0));
+	ArcadeTanksPlayerController = Cast<AArcadeTanksPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+
+	StartGame();
+
+	if (ArcadeTanksPlayerController)
+	{
+		ArcadeTanksPlayerController->SetPlayerEnabledState(false);
+
+		FTimerHandle PlayerEnableTimerHandle;
+		FTimerDelegate PlayerEnableTimerDelegate = FTimerDelegate::CreateUObject(
+			ArcadeTanksPlayerController,
+			&AArcadeTanksPlayerController::SetPlayerEnabledState,
+			true
+		);
+		GetWorldTimerManager().SetTimer(
+			PlayerEnableTimerHandle, 
+			PlayerEnableTimerDelegate,
+			StartDelay,
+			false
+		);
+	}
+	
 }
