@@ -16,10 +16,17 @@ void AArcadeTanksGameMode::ActorDied(AActor* DeadActor)
 		{
 			ArcadeTanksPlayerController->SetPlayerEnabledState(false);
 		}
+		GameOver(false);
 	}
 	else if (ATowerController* DestroyedTower = Cast<ATowerController>(DeadActor))
 	{
 		DestroyedTower->HandleDestruction();
+		TargetTowers--;
+		if (TargetTowers == 0)
+		{
+			ArcadeTanksPlayerController->SetPlayerEnabledState(false);
+			GameOver(true);
+		}
 	}
 }
 
@@ -32,6 +39,7 @@ void AArcadeTanksGameMode::BeginPlay()
 
 void AArcadeTanksGameMode::HandleGameStart()
 {
+	TargetTowers = GetTargetTowerCount();
 	Tank = Cast<ATankController>(UGameplayStatics::GetPlayerPawn(this, 0));
 	ArcadeTanksPlayerController = Cast<AArcadeTanksPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 
@@ -54,5 +62,12 @@ void AArcadeTanksGameMode::HandleGameStart()
 			false
 		);
 	}
-	
+}
+
+int32 AArcadeTanksGameMode::GetTargetTowerCount()
+{
+	TArray<AActor*> Towers;
+	UGameplayStatics::GetAllActorsOfClass(this, ATowerController::StaticClass(), Towers);
+
+	return Towers.Num();
 }
