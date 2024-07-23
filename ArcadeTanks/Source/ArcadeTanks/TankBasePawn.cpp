@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Projectile.h"
+#include "Particles/ParticleSystem.h"
 
 // Sets default values
 ATankBasePawn::ATankBasePawn()
@@ -29,8 +30,12 @@ ATankBasePawn::ATankBasePawn()
 
 void ATankBasePawn::HandleDestruction()
 {
-
+	if (DeathParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, DeathParticles, GetActorLocation(), GetActorRotation());
+	}
 }
+	
 
 void ATankBasePawn::RotateTurret(FVector LookAtTarget)
 {
