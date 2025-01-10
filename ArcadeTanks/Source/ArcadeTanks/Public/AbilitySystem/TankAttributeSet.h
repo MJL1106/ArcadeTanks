@@ -15,7 +15,7 @@ GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
 UCLASS()
-class GAME_API UTankAttributeSet : public UAttributeSet
+class ARCADETANKS_API UTankAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 

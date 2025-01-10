@@ -31,6 +31,9 @@ public:
 	UAbilitySystemComponent* AbilitySystemComponent;
 
 	// Movement Properties
+	UPROPERTY()
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float MovementSpeed = 200.0f;
 

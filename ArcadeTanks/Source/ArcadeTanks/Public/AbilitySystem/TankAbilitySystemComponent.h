@@ -7,7 +7,7 @@
 #include "TankAbilitySystemComponent.generated.h"
 
 UCLASS()
-class GAME_API UTankAbilitySystemComponent : public UAbilitySystemComponent
+class ARCADETANKS_API UTankAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 

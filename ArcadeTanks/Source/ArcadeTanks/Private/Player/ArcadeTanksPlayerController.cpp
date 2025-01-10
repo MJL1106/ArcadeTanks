@@ -58,9 +58,8 @@ void AArcadeTanksPlayerController::HandleMoveInput(const FInputActionValue& Valu
     
     if (ControlledTank)
     {
-        FVector DeltaLocation = ControlledTank->GetActorForwardVector() * MovementValue * 
-            GetWorld()->GetDeltaSeconds() * ControlledTank->GetMovementSpeed();
-        ControlledTank->AddActorWorldOffset(DeltaLocation, true);
+        const FVector Direction = ControlledTank->GetActorForwardVector();
+        ControlledTank->AddMovementInput(Direction, MovementValue);
     }
 }
 

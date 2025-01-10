@@ -23,7 +23,12 @@ ATankCharacterBase::ATankCharacterBase()
 	AttributeSet = CreateDefaultSubobject<UTankAttributeSet>(TEXT("AttributeSet"));
 
 	bUseControllerRotationYaw = false;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+
+	if (Movement)
+	{
+		Movement->bOrientRotationToMovement = false;
+		Movement->MaxWalkSpeed = MovementSpeed;
+	}
 }
 
 void ATankCharacterBase::PossessedBy(AController* NewController)
