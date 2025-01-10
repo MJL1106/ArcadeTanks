@@ -29,7 +29,7 @@ protected:
 
 private:
 	
-	class ATankController* Tank;
+	class APlayerTank* Tank;
 
 	class AArcadeTanksPlayerController* ArcadeTanksPlayerController;
 
