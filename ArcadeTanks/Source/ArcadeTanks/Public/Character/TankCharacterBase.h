@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/TankAbilitySystemComponent.h"
 #include "TankCharacterBase.generated.h"
 
 UCLASS()
@@ -60,6 +61,7 @@ public:
 	// Getter functions for movement properties
 	float GetMovementSpeed() const { return MovementSpeed; }
 	float GetTurnRate() const { return TurnRate; }
+	USkeletalMeshComponent* GetTurretMesh() const { return TurretMesh; }
 
 protected:
 	virtual void BeginPlay() override;

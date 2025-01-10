@@ -3,10 +3,14 @@
 
 #include "Player/ArcadeTanksPlayerController.h"
 
+#include "AbilitySystemComponent.h"
 #include "Character/TankCharacterBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameplayTagContainer.h"
 #include "InputActionValue.h"
+#include "TankGameplayTags.h"
+#include "AbilitySystem/TankAbilitySystemComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -39,6 +43,7 @@ void AArcadeTanksPlayerController::SetupInputComponent()
         // Bind the actions
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AArcadeTanksPlayerController::HandleMoveInput);
         EnhancedInputComponent->BindAction(RotateAction, ETriggerEvent::Triggered, this, &AArcadeTanksPlayerController::HandleRotateInput);
+        EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &AArcadeTanksPlayerController::HandleShootInput);
     }
 }
 
@@ -73,6 +78,19 @@ void AArcadeTanksPlayerController::HandleRotateInput(const FInputActionValue& Va
         FRotator DeltaRotation = FRotator::ZeroRotator;
         DeltaRotation.Yaw = RotationValue * ControlledTank->GetTurnRate() * DeltaTime;
         ControlledTank->AddActorLocalRotation(DeltaRotation, true);
+    }
+}
+
+void AArcadeTanksPlayerController::HandleShootInput()
+{
+    UTankAbilitySystemComponent* TankASC = Cast<UTankAbilitySystemComponent>(ControlledTank->GetAbilitySystemComponent());
+    
+    if (ControlledTank && TankASC)
+    {
+        FGameplayTag EventTag = FTankGameplayTags::Get().Ability_Tank_Shoot;
+        
+        TankASC->TryActivateAbilitiesByTag(
+            FGameplayTagContainer(EventTag));
     }
 }
 

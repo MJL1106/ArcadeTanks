@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	class UInputAction* RotateAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ShootAction;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	class UInputMappingContext* DefaultMappingContext;
 
@@ -43,6 +46,7 @@ private:
 	// Input Handler Functions
 	void HandleMoveInput(const struct FInputActionValue& Value);
 	void HandleRotateInput(const struct FInputActionValue& Value);
+	void HandleShootInput();
 	void HandleTurretRotation();
 
 	// Helper Functions
