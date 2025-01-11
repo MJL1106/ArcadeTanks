@@ -35,8 +35,7 @@ void UShootAbility::ActivateAbility(
         EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
         return;
     }
-
-    // Play the shooting montage if we have one
+    
     if (BaseShootMontage)
     {
         ATankCharacterBase* Character = Cast<ATankCharacterBase>(GetAvatarActorFromActorInfo());
@@ -61,6 +60,7 @@ void UShootAbility::ActivateAbility(
             FTimerDelegate SpawnDelegate;
             SpawnDelegate.BindUObject(this, &UShootAbility::SpawnProjectile);
             GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, SpawnDelegate, ProjectileSpawnDelay, false);
+            EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
         }
         else
         {

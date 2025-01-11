@@ -21,6 +21,15 @@ FString("Shoot ability for tanks")
 
 	/* End Abilities*/
 
+	/* Cooldown */
+
+	GameplayTags.Cooldown_Tank_Shoot = Manager.AddNativeGameplayTag(
+	FName("Cooldown.Tank.Shoot"),
+FString("Shoot ability Cooldown")
+	);
+	
+	/* End Cooldown */
+
 	/* Actor Types */
 	
 	GameplayTags.Actor_Type_Enemy = Manager.AddNativeGameplayTag(

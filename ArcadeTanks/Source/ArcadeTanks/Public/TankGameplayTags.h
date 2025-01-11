@@ -21,9 +21,17 @@ public:
 	FGameplayTag Ability_Tank_Shoot;
 	/* End Abilities */
 
+	/* Cooldown */
+
+	FGameplayTag Cooldown_Tank_Shoot;
+
+	/* End Cooldown */
+
 	/* Actor Type */
 	FGameplayTag Actor_Type_Enemy;
 	/* End Actor Type */
+
+	
 private:
 	// Internal singleton instance
 	static FTankGameplayTags GameplayTags;
