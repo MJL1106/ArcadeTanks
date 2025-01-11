@@ -27,20 +27,14 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
 	TSubclassOf<class AActor> ProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
-	float ProjectileSpeed = 2000.0f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	UAnimMontage* ShootMontage;
+	UAnimMontage* BaseShootMontage;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	float ProjectileSpawnDelay = 0.0f;
 
 private:
-	UFUNCTION()
-	void OnMontageCompleted();
-
 	UFUNCTION()
 	void SpawnProjectile();
 };

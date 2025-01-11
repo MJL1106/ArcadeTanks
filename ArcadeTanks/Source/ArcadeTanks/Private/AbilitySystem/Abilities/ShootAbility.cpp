@@ -2,11 +2,15 @@
 
 
 #include "AbilitySystem/Abilities/ShootAbility.h"
+
+#include "Projectile.h"
 #include "Abilities/Tasks/AbilityTask.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 
 
 #include "Character/TankCharacterBase.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UShootAbility::UShootAbility()
 {
@@ -33,21 +37,23 @@ void UShootAbility::ActivateAbility(
     }
 
     // Play the shooting montage if we have one
-    if (ShootMontage)
+    if (BaseShootMontage)
     {
-        UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-            this,
-            NAME_None,
-            ShootMontage,
-            1.0f,    // Play Rate
-            NAME_None, // Start Section Name
-            false    // StopWhenAbilityEnds
-        );
+        ATankCharacterBase* Character = Cast<ATankCharacterBase>(GetAvatarActorFromActorInfo());
+        if (!Character)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Invalid Character for montage!"));
+            return;
+        }
 
-        MontageTask->OnCompleted.AddDynamic(this, &UShootAbility::OnMontageCompleted);
-        MontageTask->OnInterrupted.AddDynamic(this, &UShootAbility::OnMontageCompleted);
-        MontageTask->OnCancelled.AddDynamic(this, &UShootAbility::OnMontageCompleted);
-        MontageTask->ReadyForActivation();
+        USkeletalMeshComponent* BaseMesh = Character->GetBaseMesh();
+        if (!BaseMesh)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Invalid Mesh for montage!"));
+            return;
+        }
+
+        BaseMesh->GetAnimInstance()->Montage_Play(BaseShootMontage, 1.0f);
         
         if (ProjectileSpawnDelay > 0.0f)
         {
@@ -59,6 +65,7 @@ void UShootAbility::ActivateAbility(
         else
         {
             SpawnProjectile();
+            EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
         }
     }
     else
@@ -85,26 +92,20 @@ void UShootAbility::SpawnProjectile()
     SpawnParams.Owner = Tank;
     SpawnParams.Instigator = Tank;
 
-    AActor* Projectile = GetWorld()->SpawnActor<AActor>(
-        ProjectileClass,
-        SpawnLocation,
-        SpawnRotation,
-        SpawnParams
-    );
+    
+    AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+     ProjectileClass,                   
+     FTransform(SpawnRotation, SpawnLocation),
+     Tank,                              
+     Tank,                   
+     ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+     );
 
     if (Projectile)
     {
-        if (UPrimitiveComponent* PrimComp = Cast<UPrimitiveComponent>(Projectile->GetRootComponent()))
-        {
-            PrimComp->AddImpulse(SpawnRotation.Vector() * ProjectileSpeed);
-        }
-    }
-}
-
-void UShootAbility::OnMontageCompleted()
-{
-    if (HasAuthority(&CurrentActivationInfo))
-    {
-        EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+        Projectile->ProjectileMovementComponent->MaxSpeed = Tank->MaxBulletSpeed;
+        Projectile->ProjectileMovementComponent->InitialSpeed = Tank->InitialBulletSpeed;
+        
+        UGameplayStatics::FinishSpawningActor(Projectile, FTransform(SpawnRotation, SpawnLocation));
     }
 }
