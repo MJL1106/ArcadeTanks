@@ -17,9 +17,7 @@ public:
 	// Initialize the ASC actor info
 	virtual void InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor) override;
 
-	// Custom function for tank-specific ability handling
-	UFUNCTION(BlueprintCallable, Category = "Tank|Abilities")
-	void InitializeComponent();
+	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 
 protected:
 	virtual void BeginPlay() override;

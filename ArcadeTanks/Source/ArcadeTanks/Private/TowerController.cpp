@@ -5,6 +5,7 @@
 #include "TankController.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
+#include "Character/PlayerTank.h"
 
 void ATowerController::Tick(float DeltaTime)
 {
@@ -28,7 +29,7 @@ void ATowerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Tank = Cast<ATankController>(UGameplayStatics::GetPlayerPawn(this,0));
+	Tank = Cast<APlayerTank>(UGameplayStatics::GetPlayerPawn(this,0));
 
 	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ATowerController::CheckFireCondition, FireRate, true);
 	
@@ -40,7 +41,7 @@ void ATowerController::CheckFireCondition()
 	{
 		return;
 	}
-	if (InFireRange() && Tank->bAlive)
+	if (InFireRange())
 	{
 		Fire();
 	}

@@ -21,8 +21,8 @@ AProjectile::AProjectile()
 	TrailParticles->SetupAttachment(RootComponent);
 
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
-	ProjectileMovementComponent->MaxSpeed = 1300.f;
-	ProjectileMovementComponent->InitialSpeed = 1300.f;
+	ProjectileMovementComponent->MaxSpeed = MaxSpeed;
+	ProjectileMovementComponent->InitialSpeed = InitialSpeed;
 }
 
 // Called when the game starts or when spawned

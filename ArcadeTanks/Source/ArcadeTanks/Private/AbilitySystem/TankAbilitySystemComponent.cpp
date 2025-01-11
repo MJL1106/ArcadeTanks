@@ -3,6 +3,9 @@
 
 #include "AbilitySystem/TankAbilitySystemComponent.h"
 
+#include "TankGameplayTags.h"
+#include "AbilitySystem/Abilities/TankGameplayAbility.h"
+
 UTankAbilitySystemComponent::UTankAbilitySystemComponent()
 {
 	SetIsReplicated(true);
@@ -20,8 +23,15 @@ void UTankAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AAc
 	
 }
 
-void UTankAbilitySystemComponent::InitializeComponent()
+void UTankAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
 {
-	Super::InitializeComponent();
-	
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		if (const UTankGameplayAbility* TankAbility = Cast<UTankGameplayAbility>(AbilitySpec.Ability))
+		{
+			AbilitySpec.DynamicAbilityTags.AddTag(TankAbility->StartupInputTag);
+			GiveAbility(AbilitySpec);
+		}
+	}
 }

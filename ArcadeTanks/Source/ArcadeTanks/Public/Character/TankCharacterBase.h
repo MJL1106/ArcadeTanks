@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/TankAbilitySystemComponent.h"
 #include "TankCharacterBase.generated.h"
 
 UCLASS()
@@ -40,6 +41,16 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float TurnRate = 45.0f;
 
+	// Shoot properties
+	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
+	float FireRate = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
+	float InitialBulletSpeed = 1300.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
+	float MaxBulletSpeed = 1300.f;
+	
 	// Effects
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	UParticleSystem* DestructionEffect;
@@ -60,6 +71,8 @@ public:
 	// Getter functions for movement properties
 	float GetMovementSpeed() const { return MovementSpeed; }
 	float GetTurnRate() const { return TurnRate; }
+	USkeletalMeshComponent* GetTurretMesh() const { return TurretMesh; }
+	USkeletalMeshComponent* GetBaseMesh() const { return TankBaseMesh; }
 
 protected:
 	virtual void BeginPlay() override;

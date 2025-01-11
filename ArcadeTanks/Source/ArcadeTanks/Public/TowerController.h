@@ -27,7 +27,7 @@ protected:
 
 private:
 
-	class ATankController* Tank;
+	class APlayerTank* Tank;
 
 	float Distance;
 	

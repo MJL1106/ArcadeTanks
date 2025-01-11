@@ -18,8 +18,7 @@ ATankCharacterBase::ATankCharacterBase()
 	TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
 	TurretMesh->SetupAttachment(TankBaseMesh);
 
-	
-	AbilitySystemComponent = CreateDefaultSubobject<UTankAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent = CreateDefaultSubobject<UTankAbilitySystemComponent>(TEXT("ASC"));
 	AttributeSet = CreateDefaultSubobject<UTankAttributeSet>(TEXT("AttributeSet"));
 
 	bUseControllerRotationYaw = false;
@@ -34,7 +33,7 @@ ATankCharacterBase::ATankCharacterBase()
 void ATankCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
+	
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
@@ -46,7 +45,7 @@ void ATankCharacterBase::PossessedBy(AController* NewController)
 void ATankCharacterBase::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-
+	
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
@@ -71,13 +70,11 @@ void ATankCharacterBase::InitializeAttributes()
 
 void ATankCharacterBase::GiveDefaultAbilities()
 {
-	if (HasAuthority() && AbilitySystemComponent)
+	UTankAbilitySystemComponent* TankASC = CastChecked<UTankAbilitySystemComponent>(AbilitySystemComponent);
+	
+	if (HasAuthority() && TankASC)
 	{
-		for (TSubclassOf<UGameplayAbility>& DefaultAbility : DefaultAbilities)
-		{
-			AbilitySystemComponent->GiveAbility(
-				FGameplayAbilitySpec(DefaultAbility, 1, INDEX_NONE, this));
-		}
+		TankASC->AddCharacterAbilities(DefaultAbilities);
 	}
 }
 
