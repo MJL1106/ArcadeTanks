@@ -25,8 +25,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank")
 	USkeletalMeshComponent* TankBaseMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank")
-	USkeletalMeshComponent* TurretMesh;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank")
+	USkeletalMeshComponent* TurretMesh;*/
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent;
@@ -40,6 +40,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
 	float TurnRate = 45.0f;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Tank")
+	FRotator TurretTargetRotation;
 
 	// Shoot properties
 	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
@@ -71,9 +74,10 @@ public:
 	// Getter functions for movement properties
 	float GetMovementSpeed() const { return MovementSpeed; }
 	float GetTurnRate() const { return TurnRate; }
-	USkeletalMeshComponent* GetTurretMesh() const { return TurretMesh; }
+	//USkeletalMeshComponent* GetTurretMesh() const { return TurretMesh; }
 	USkeletalMeshComponent* GetBaseMesh() const { return TankBaseMesh; }
 
+	FRotator GetTurretRotation(const FVector& TargetLocation) const;
 protected:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -90,8 +94,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
 
+	FName TurretBoneName = "BoneTurret";
+
 private:
-	FRotator GetTurretRotation(const FVector& TargetLocation) const;
 	void InitializeAttributes();
 	void GiveDefaultAbilities();
 

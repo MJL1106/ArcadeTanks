@@ -83,29 +83,30 @@ void UShootAbility::SpawnProjectile()
         return;
     }
     
-    FVector SpawnLocation = Tank->GetTurretMesh()->GetSocketLocation(FName("ProjectileSocket"));
+    FVector SocketLocation = Tank->GetBaseMesh()->GetSocketLocation(FName("ProjectileSocket"));
+    FRotator SocketRotation = Tank->GetBaseMesh()->GetSocketRotation(FName("ProjectileSocket"));
     
-    FRotator SpawnRotation = Tank->GetTurretMesh()->GetComponentRotation();
-    SpawnRotation.Yaw += 90.f;
-
+    // Add offset in the direction the socket is facing
+    FVector ForwardVector = SocketRotation.Vector();
+    FVector SpawnLocation = SocketLocation + (ForwardVector * 10.0f); // Adjust 100.0f as needed
+    
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = Tank;
     SpawnParams.Instigator = Tank;
-
     
     AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
-     ProjectileClass,                   
-     FTransform(SpawnRotation, SpawnLocation),
-     Tank,                              
-     Tank,                   
-     ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
-     );
+        ProjectileClass,                   
+        FTransform(SocketRotation, SpawnLocation), // Using the offset spawn location
+        Tank,                              
+        Tank,                   
+        ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+    );
 
     if (Projectile)
     {
         Projectile->ProjectileMovementComponent->MaxSpeed = Tank->MaxBulletSpeed;
         Projectile->ProjectileMovementComponent->InitialSpeed = Tank->InitialBulletSpeed;
         
-        UGameplayStatics::FinishSpawningActor(Projectile, FTransform(SpawnRotation, SpawnLocation));
+        UGameplayStatics::FinishSpawningActor(Projectile, FTransform(SocketRotation, SpawnLocation));
     }
 }

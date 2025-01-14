@@ -15,8 +15,8 @@ ATankCharacterBase::ATankCharacterBase()
 	TankBaseMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TankBaseMesh"));
 	TankBaseMesh->SetupAttachment(GetRootComponent());
 
-	TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
-	TurretMesh->SetupAttachment(TankBaseMesh);
+	/*TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
+	TurretMesh->SetupAttachment(TankBaseMesh);*/
 
 	AbilitySystemComponent = CreateDefaultSubobject<UTankAbilitySystemComponent>(TEXT("ASC"));
 	AttributeSet = CreateDefaultSubobject<UTankAttributeSet>(TEXT("AttributeSet"));
@@ -103,20 +103,36 @@ void ATankCharacterBase::HandleDestruction()
 
 void ATankCharacterBase::RotateTurret(FVector TargetLocation)
 {
-	const FRotator NewRotation = GetTurretRotation(TargetLocation);
-	TurretMesh->SetWorldRotation(FMath::RInterpTo(
-		TurretMesh->GetComponentRotation(),
-		NewRotation,
-		GetWorld()->GetDeltaSeconds(),
-		5.0f
-	));
+	FRotator TargetRotation = GetTurretRotation(TargetLocation);
+    
+	TurretTargetRotation = FMath::RInterpTo(
+	   TurretTargetRotation,  
+	   TargetRotation,        
+	   GetWorld()->GetDeltaSeconds(),
+	   5.0f                   
+	);
+    
+	// Ensure the rotation stays within -180 to 180 degrees
+	TurretTargetRotation.Normalize();
 }
 
 FRotator ATankCharacterBase::GetTurretRotation(const FVector& TargetLocation) const
 {
-	FVector ToTarget = TargetLocation - TurretMesh->GetComponentLocation();
-	FRotator LookAtRotation = FRotator(0.0f, ToTarget.Rotation().Yaw - 90.0f, 0.0f);
-	return LookAtRotation;
+	FVector SocketLocation = TankBaseMesh->GetSocketLocation(FName("TurretSocket"));
+	FVector ToTarget = TargetLocation - SocketLocation;
+    
+	// Get the world rotation
+	FRotator WorldRotation = ToTarget.Rotation();
+    
+	// Convert to local space but ONLY use the Yaw component
+	FRotator LocalRotation = FRotator(
+		0.0f,  // Keep pitch at 0
+		(WorldRotation - TankBaseMesh->GetComponentRotation()).Yaw - 90.0f,  // Only use Yaw
+		0.0f   // Keep roll at 0
+	);
+    
+	LocalRotation.Normalize();
+	return LocalRotation;
 }
 
 void ATankCharacterBase::BeginPlay()
