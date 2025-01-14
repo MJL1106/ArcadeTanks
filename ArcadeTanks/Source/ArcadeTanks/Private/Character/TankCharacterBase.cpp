@@ -15,8 +15,8 @@ ATankCharacterBase::ATankCharacterBase()
 	TankBaseMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TankBaseMesh"));
 	TankBaseMesh->SetupAttachment(GetRootComponent());
 
-	TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
-	TurretMesh->SetupAttachment(TankBaseMesh);
+	/*TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
+	TurretMesh->SetupAttachment(TankBaseMesh);*/
 
 	AbilitySystemComponent = CreateDefaultSubobject<UTankAbilitySystemComponent>(TEXT("ASC"));
 	AttributeSet = CreateDefaultSubobject<UTankAttributeSet>(TEXT("AttributeSet"));
@@ -103,20 +103,33 @@ void ATankCharacterBase::HandleDestruction()
 
 void ATankCharacterBase::RotateTurret(FVector TargetLocation)
 {
-	const FRotator NewRotation = GetTurretRotation(TargetLocation);
-	TurretMesh->SetWorldRotation(FMath::RInterpTo(
-		TurretMesh->GetComponentRotation(),
-		NewRotation,
-		GetWorld()->GetDeltaSeconds(),
-		5.0f
-	));
+	FRotator TargetRotation = GetTurretRotation(TargetLocation);
+    
+	TurretTargetRotation = FMath::RInterpTo(
+	   TurretTargetRotation,  
+	   TargetRotation,        
+	   GetWorld()->GetDeltaSeconds(),
+	   5.0f                   
+	);
+	
+	TurretTargetRotation.Normalize();
 }
 
 FRotator ATankCharacterBase::GetTurretRotation(const FVector& TargetLocation) const
 {
-	FVector ToTarget = TargetLocation - TurretMesh->GetComponentLocation();
-	FRotator LookAtRotation = FRotator(0.0f, ToTarget.Rotation().Yaw - 90.0f, 0.0f);
-	return LookAtRotation;
+	FVector SocketLocation = TankBaseMesh->GetSocketLocation(FName("ProjectileSocket"));
+	FVector ToTarget = TargetLocation - SocketLocation;
+	
+	FRotator WorldRotation = ToTarget.Rotation();
+	
+	FRotator LocalRotation = FRotator(
+		0.0f,
+		(WorldRotation - TankBaseMesh->GetComponentRotation()).Yaw - 90.0f,
+		0.0f
+	);
+    
+	LocalRotation.Normalize();
+	return LocalRotation;
 }
 
 void ATankCharacterBase::BeginPlay()
