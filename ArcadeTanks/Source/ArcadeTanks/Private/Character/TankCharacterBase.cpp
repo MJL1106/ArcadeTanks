@@ -111,24 +111,21 @@ void ATankCharacterBase::RotateTurret(FVector TargetLocation)
 	   GetWorld()->GetDeltaSeconds(),
 	   5.0f                   
 	);
-    
-	// Ensure the rotation stays within -180 to 180 degrees
+	
 	TurretTargetRotation.Normalize();
 }
 
 FRotator ATankCharacterBase::GetTurretRotation(const FVector& TargetLocation) const
 {
-	FVector SocketLocation = TankBaseMesh->GetSocketLocation(FName("TurretSocket"));
+	FVector SocketLocation = TankBaseMesh->GetSocketLocation(FName("ProjectileSocket"));
 	FVector ToTarget = TargetLocation - SocketLocation;
-    
-	// Get the world rotation
+	
 	FRotator WorldRotation = ToTarget.Rotation();
-    
-	// Convert to local space but ONLY use the Yaw component
+	
 	FRotator LocalRotation = FRotator(
-		0.0f,  // Keep pitch at 0
-		(WorldRotation - TankBaseMesh->GetComponentRotation()).Yaw - 90.0f,  // Only use Yaw
-		0.0f   // Keep roll at 0
+		0.0f,
+		(WorldRotation - TankBaseMesh->GetComponentRotation()).Yaw - 90.0f,
+		0.0f
 	);
     
 	LocalRotation.Normalize();
