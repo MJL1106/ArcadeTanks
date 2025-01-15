@@ -3,13 +3,17 @@
 
 #include "AbilitySystem/TankAttributeSet.h"
 
+#include "TankBasePawn.h"
+#include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
+
+class ATankBasePawn;
 
 UTankAttributeSet::UTankAttributeSet()
 {
 	// Set default values
-	InitHealth(100.0f);
-	InitMaxHealth(100.0f);
+	InitHealth(60.0f);
+	InitMaxHealth(60.0f);
 	InitArmor(50.0f);
 }
 
@@ -20,6 +24,25 @@ void UTankAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+}
+
+void UTankAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	Super::PostGameplayEffectExecute(Data);
+
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		const float NewHealth = FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth());
+		SetHealth(NewHealth);
+
+		if (NewHealth <= 0.0f)
+		{
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetOwningActor()))
+			{
+				CombatInterface->HandleDestruction();
+			}
+		}
+	}
 }
 
 void UTankAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)

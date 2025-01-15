@@ -5,6 +5,7 @@
 
 #include "AbilitySystem/TankAbilitySystemComponent.h"
 #include "AbilitySystem/TankAttributeSet.h"
+#include "Game/ArcadeTanksGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,9 +15,6 @@ ATankCharacterBase::ATankCharacterBase()
 
 	TankBaseMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TankBaseMesh"));
 	TankBaseMesh->SetupAttachment(GetRootComponent());
-
-	/*TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
-	TurretMesh->SetupAttachment(TankBaseMesh);*/
 
 	AbilitySystemComponent = CreateDefaultSubobject<UTankAbilitySystemComponent>(TEXT("ASC"));
 	AttributeSet = CreateDefaultSubobject<UTankAttributeSet>(TEXT("AttributeSet"));
@@ -99,6 +97,32 @@ void ATankCharacterBase::HandleDestruction()
 	{
 		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(DestructionCameraShake);
 	}
+	
+	TankBaseMesh->GetAnimInstance()->Montage_Play(DeathMontage, 1.0f);
+	
+	/*SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);*/
+
+	AArcadeTanksGameMode* ArcadeTanksGameMode = Cast<AArcadeTanksGameMode>(UGameplayStatics::GetGameMode(this));
+	ArcadeTanksGameMode->ActorDied(this);
+}
+
+float ATankCharacterBase::GetHealth_Implementation() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetHealth();
+	}
+	return 0.0f;
+}
+
+float ATankCharacterBase::GetMaxHealth_Implementation() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMaxHealth();
+	}
+	return 0.0f;
 }
 
 void ATankCharacterBase::RotateTurret(FVector TargetLocation)
