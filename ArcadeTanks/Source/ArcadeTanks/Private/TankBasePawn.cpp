@@ -6,12 +6,13 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Projectile.h"
+#include "AbilitySystem/TankAbilitySystemComponent.h"
+#include "AbilitySystem/TankAttributeSet.h"
 #include "Particles/ParticleSystem.h"
 
 // Sets default values
 ATankBasePawn::ATankBasePawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CapsuleComp = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
@@ -26,7 +27,47 @@ ATankBasePawn::ATankBasePawn()
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(TurretMesh);
 
+	AbilitySystemComponent = CreateDefaultSubobject<UTankAbilitySystemComponent>(TEXT("ASC"));
+	AttributeSet = CreateDefaultSubobject<UTankAttributeSet>(TEXT("AttributeSet"));
 }
+
+void ATankBasePawn::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		InitializeAttributes();
+		GiveDefaultAbilities();
+	}
+}
+
+void ATankBasePawn::InitializeAttributes()
+{
+	if (AbilitySystemComponent && InitialAttributes)
+	{
+		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(InitialAttributes, 1, EffectContext);
+		if (SpecHandle.IsValid())
+		{
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+void ATankBasePawn::GiveDefaultAbilities()
+{
+	UTankAbilitySystemComponent* TurretASC = CastChecked<UTankAbilitySystemComponent>(AbilitySystemComponent);
+	
+	if (HasAuthority() && TurretASC)
+	{
+		TurretASC->AddCharacterAbilities(InitialAbilities);
+	}
+}
+
 
 void ATankBasePawn::HandleDestruction()
 {
@@ -42,8 +83,26 @@ void ATankBasePawn::HandleDestruction()
 	{
 		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(DeathCameraShakeClass);
 	}
+	Destroy();
 }
-	
+
+float ATankBasePawn::GetHealth_Implementation() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetHealth();
+	}
+	return 0.0f;
+}
+
+float ATankBasePawn::GetMaxHealth_Implementation() const
+{
+	if (AttributeSet)
+	{
+		return AttributeSet->GetMaxHealth();
+	}
+	return 0.0f;
+}
 
 void ATankBasePawn::RotateTurret(FVector LookAtTarget)
 {

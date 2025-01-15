@@ -86,9 +86,8 @@ void UShootAbility::SpawnProjectile()
     FVector SocketLocation = Tank->GetBaseMesh()->GetSocketLocation(FName("ProjectileSocket"));
     FRotator SocketRotation = Tank->GetBaseMesh()->GetSocketRotation(FName("ProjectileSocket"));
     
-    // Add offset in the direction the socket is facing
     FVector ForwardVector = SocketRotation.Vector();
-    FVector SpawnLocation = SocketLocation + (ForwardVector * 10.0f); // Adjust 100.0f as needed
+    FVector SpawnLocation = SocketLocation + (ForwardVector * 10.0f);
     
     FActorSpawnParameters SpawnParams;
     SpawnParams.Owner = Tank;
@@ -96,7 +95,7 @@ void UShootAbility::SpawnProjectile()
     
     AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
         ProjectileClass,                   
-        FTransform(SocketRotation, SpawnLocation), // Using the offset spawn location
+        FTransform(SocketRotation, SpawnLocation),
         Tank,                              
         Tank,                   
         ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn

@@ -2,6 +2,11 @@
 
 
 #include "Projectile.h"
+
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
+#include "GameplayEffect.h"
+#include "GameplayEffectTypes.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework//DamageType.h"
@@ -53,14 +58,26 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		Destroy();
 		return;
 	}
-	
-	AController* MyOwnerInstigator = MyOwner->GetInstigatorController();
-	UClass* DamageTypeClass = UDamageType::StaticClass();
 
 	if (OtherActor && OtherActor != this && OtherActor != MyOwner)
 	{
-		UGameplayStatics::ApplyDamage(OtherActor, Damage, MyOwnerInstigator, this, DamageTypeClass);
+		IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OtherActor);
+        if (ASCInterface)
+        {
+            if (DamageEffectClass)
+            {
+                FGameplayEffectContextHandle EffectContext = ASCInterface->GetAbilitySystemComponent()->MakeEffectContext();
+                EffectContext.AddSourceObject(this);
 
+                FGameplayEffectSpecHandle SpecHandle = ASCInterface->GetAbilitySystemComponent()->MakeOutgoingSpec(DamageEffectClass, 1, EffectContext);
+                if (SpecHandle.IsValid())
+                {
+                    SpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Damage")), -Damage);
+                    ASCInterface->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+                }
+            }
+        }
+		
 		if (HitParticles)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, GetActorLocation(), GetActorRotation());

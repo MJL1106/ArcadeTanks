@@ -3,25 +3,49 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Pawn.h"
+#include "Interaction/CombatInterface.h"
 #include "TankBasePawn.generated.h"
 
 UCLASS()
-class ARCADETANKS_API ATankBasePawn : public APawn
+class ARCADETANKS_API ATankBasePawn : public APawn, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
 	ATankBasePawn();
+	void InitializeAttributes();
+	void GiveDefaultAbilities();
 
-	void HandleDestruction();
+	// Ability System
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
+	class UTankAttributeSet* GetAttributeSet() const { return AttributeSet; }
+
+	// Combat Interface
+	virtual void HandleDestruction() override;
+	virtual float GetHealth_Implementation() const override;
+	virtual float GetMaxHealth_Implementation() const override;
 
 protected:
 
+	virtual void BeginPlay() override;
+	
 	void RotateTurret(FVector LookAtTarget);
-
 	void Fire();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
+	UAbilitySystemComponent* AbilitySystemComponent;
+
+	UPROPERTY()
+	class UTankAttributeSet* AttributeSet;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TArray<TSubclassOf<class UGameplayAbility>> InitialAbilities;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TSubclassOf<class UGameplayEffect> InitialAttributes;
 
 private:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))

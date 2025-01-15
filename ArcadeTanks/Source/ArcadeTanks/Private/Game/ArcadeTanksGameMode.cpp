@@ -13,16 +13,14 @@ void AArcadeTanksGameMode::ActorDied(AActor* DeadActor)
 {
 	if (DeadActor == Tank)
 	{
-		Tank->HandleDestruction();
 		if (ArcadeTanksPlayerController)
 		{
 			ArcadeTanksPlayerController->SetPlayerEnabledState(false);
 		}
 		GameOver(false);
 	}
-	else if (ATowerController* DestroyedTower = Cast<ATowerController>(DeadActor))
+	else
 	{
-		DestroyedTower->HandleDestruction();
 		TargetTowers--;
 		if (TargetTowers == 0)
 		{

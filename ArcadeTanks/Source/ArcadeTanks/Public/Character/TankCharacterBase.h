@@ -6,10 +6,11 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "AbilitySystem/TankAbilitySystemComponent.h"
+#include "Interaction/CombatInterface.h"
 #include "TankCharacterBase.generated.h"
 
 UCLASS()
-class ARCADETANKS_API ATankCharacterBase : public ACharacter, public IAbilitySystemInterface
+class ARCADETANKS_API ATankCharacterBase : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -25,11 +26,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank")
 	USkeletalMeshComponent* TankBaseMesh;
 
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Tank")
-	USkeletalMeshComponent* TurretMesh;*/
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent;
+
+	// Combat Interface
+	virtual void HandleDestruction() override;
+	virtual float GetHealth_Implementation() const override;
+	virtual float GetMaxHealth_Implementation() const override;
 
 	// Movement Properties
 	UPROPERTY()
@@ -64,17 +67,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TSubclassOf<UCameraShakeBase> DestructionCameraShake;
 
-	// Functions
-	UFUNCTION(BlueprintCallable, Category = "Tank")
-	virtual void HandleDestruction();
-
 	UFUNCTION(BlueprintCallable, Category = "Tank")
 	virtual void RotateTurret(FVector TargetLocation);
 
 	// Getter functions for movement properties
 	float GetMovementSpeed() const { return MovementSpeed; }
 	float GetTurnRate() const { return TurnRate; }
-	//USkeletalMeshComponent* GetTurretMesh() const { return TurretMesh; }
 	USkeletalMeshComponent* GetBaseMesh() const { return TankBaseMesh; }
 
 	FRotator GetTurretRotation(const FVector& TargetLocation) const;
