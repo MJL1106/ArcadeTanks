@@ -18,11 +18,6 @@ void ATowerController::Tick(float DeltaTime)
 	}
 }
 
-void  ATowerController::HandleDestruction()
-{
-	Super::HandleDestruction();
-}
-
 void ATowerController::BeginPlay()
 {
 	Super::BeginPlay();

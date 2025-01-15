@@ -97,9 +97,11 @@ void ATankCharacterBase::HandleDestruction()
 	{
 		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(DestructionCameraShake);
 	}
-
-	SetActorHiddenInGame(true);
-	SetActorTickEnabled(false);
+	
+	TankBaseMesh->GetAnimInstance()->Montage_Play(DeathMontage, 1.0f);
+	
+	/*SetActorHiddenInGame(true);
+	SetActorTickEnabled(false);*/
 
 	AArcadeTanksGameMode* ArcadeTanksGameMode = Cast<AArcadeTanksGameMode>(UGameplayStatics::GetGameMode(this));
 	ArcadeTanksGameMode->ActorDied(this);

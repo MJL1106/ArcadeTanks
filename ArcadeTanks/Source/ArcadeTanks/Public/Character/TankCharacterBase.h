@@ -46,6 +46,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Tank")
 	FRotator TurretTargetRotation;
+	
+	UFUNCTION(BlueprintCallable, Category = "Tank")
+	virtual void RotateTurret(FVector TargetLocation);
 
 	// Shoot properties
 	UPROPERTY(EditDefaultsOnly, Category = "Shooting")
@@ -67,15 +70,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	TSubclassOf<UCameraShakeBase> DestructionCameraShake;
 
-	UFUNCTION(BlueprintCallable, Category = "Tank")
-	virtual void RotateTurret(FVector TargetLocation);
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	UAnimMontage* DeathMontage;
 
 	// Getter functions for movement properties
 	float GetMovementSpeed() const { return MovementSpeed; }
 	float GetTurnRate() const { return TurnRate; }
 	USkeletalMeshComponent* GetBaseMesh() const { return TankBaseMesh; }
-
 	FRotator GetTurretRotation(const FVector& TargetLocation) const;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void PossessedBy(AController* NewController) override;

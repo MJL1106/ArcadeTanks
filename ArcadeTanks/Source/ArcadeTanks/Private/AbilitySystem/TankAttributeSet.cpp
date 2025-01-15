@@ -12,8 +12,8 @@ class ATankBasePawn;
 UTankAttributeSet::UTankAttributeSet()
 {
 	// Set default values
-	InitHealth(100.0f);
-	InitMaxHealth(100.0f);
+	InitHealth(60.0f);
+	InitMaxHealth(60.0f);
 	InitArmor(50.0f);
 }
 
@@ -37,12 +37,9 @@ void UTankAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 		if (NewHealth <= 0.0f)
 		{
-			if (AActor* Owner = GetOwningActor())
+			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetOwningActor()))
 			{
-				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Owner))
-				{
-					CombatInterface->HandleDestruction();
-				}
+				CombatInterface->HandleDestruction();
 			}
 		}
 	}
