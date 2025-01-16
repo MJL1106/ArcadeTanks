@@ -3,8 +3,7 @@
 
 #include "Game/ArcadeTanksGameMode.h"
 #include "Kismet/GameplayStatics.h"
-#include "TowerController.h"
-#include "TankController.h"
+#include "Character/TowerController.h"
 #include "Character/PlayerTank.h"
 #include "Player/ArcadeTanksPlayerController.h"
 

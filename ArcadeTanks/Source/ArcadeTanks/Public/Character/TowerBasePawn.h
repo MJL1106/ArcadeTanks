@@ -6,16 +6,16 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Pawn.h"
 #include "Interaction/CombatInterface.h"
-#include "TankBasePawn.generated.h"
+#include "TowerBasePawn.generated.h"
 
 UCLASS()
-class ARCADETANKS_API ATankBasePawn : public APawn, public IAbilitySystemInterface, public ICombatInterface
+class ARCADETANKS_API ATowerBasePawn : public APawn, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	ATankBasePawn();
+	ATowerBasePawn();
 	void InitializeAttributes();
 	void GiveDefaultAbilities();
 
@@ -35,7 +35,6 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void RotateTurret(FVector LookAtTarget);
-	void Fire();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Abilities")
 	UAbilitySystemComponent* AbilitySystemComponent;

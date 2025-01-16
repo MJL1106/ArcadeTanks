@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Projectile.h"
+#include "Actor/Projectile.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"

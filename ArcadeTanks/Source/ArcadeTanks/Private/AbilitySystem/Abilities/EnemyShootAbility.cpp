@@ -3,8 +3,8 @@
 
 #include "AbilitySystem/Abilities/EnemyShootAbility.h"
 
-#include "Projectile.h"
-#include "TowerController.h"
+#include "Actor/Projectile.h"
+#include "Character/TowerController.h"
 #include "Character/EnemyTank.h"
 #include "Character/TankCharacterBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"

@@ -1,8 +1,7 @@
  // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TowerController.h"
-#include "TankController.h"
+#include "Character/TowerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "Character/PlayerTank.h"
