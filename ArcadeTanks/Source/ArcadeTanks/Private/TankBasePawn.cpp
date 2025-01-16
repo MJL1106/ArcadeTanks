@@ -8,8 +8,10 @@
 #include "Projectile.h"
 #include "AbilitySystem/TankAbilitySystemComponent.h"
 #include "AbilitySystem/TankAttributeSet.h"
+#include "Game/ArcadeTanksGameMode.h"
 #include "Particles/ParticleSystem.h"
 
+class AArcadeTanksGameMode;
 // Sets default values
 ATankBasePawn::ATankBasePawn()
 {
@@ -83,6 +85,10 @@ void ATankBasePawn::HandleDestruction()
 	{
 		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(DeathCameraShakeClass);
 	}
+	
+	AArcadeTanksGameMode* ArcadeTanksGameMode = Cast<AArcadeTanksGameMode>(UGameplayStatics::GetGameMode(this));
+	ArcadeTanksGameMode->ActorDied(this);
+	
 	Destroy();
 }
 
