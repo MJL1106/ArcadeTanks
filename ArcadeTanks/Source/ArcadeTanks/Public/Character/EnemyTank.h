@@ -17,13 +17,13 @@ class ARCADETANKS_API AEnemyTank : public ATankCharacterBase
 public:
 	AEnemyTank();
 
-protected:
-	virtual void BeginPlay() override;
-
 	// Enemy specific properties
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float DetectionRange = 1000.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float FireRange = 800.0f;
+
+protected:
+	virtual void BeginPlay() override;
 };

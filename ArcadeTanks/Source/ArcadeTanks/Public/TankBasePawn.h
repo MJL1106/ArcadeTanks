@@ -19,6 +19,8 @@ public:
 	void InitializeAttributes();
 	void GiveDefaultAbilities();
 
+	UStaticMeshComponent* GetTurretMesh() const { return TurretMesh;}
+	
 	// Ability System
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 	class UTankAttributeSet* GetAttributeSet() const { return AttributeSet; }

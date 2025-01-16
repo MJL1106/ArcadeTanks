@@ -116,14 +116,3 @@ void ATankBasePawn::RotateTurret(FVector LookAtTarget)
 			UGameplayStatics::GetWorldDeltaSeconds(this), 
 			5.f));
 }
-
-void ATankBasePawn::Fire()
-{
-	FVector Location = ProjectileSpawnPoint->GetComponentLocation();
-	FRotator Rotation = ProjectileSpawnPoint->GetComponentRotation();
-
-	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, Location, Rotation);
-	Projectile->SetOwner(this);
-	
-}
-

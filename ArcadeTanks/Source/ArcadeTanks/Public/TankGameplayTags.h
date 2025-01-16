@@ -19,12 +19,12 @@ public:
 
 	/* Abilities */
 	FGameplayTag Ability_Tank_Shoot;
+	FGameplayTag Ability_Enemy_Shoot;
 	/* End Abilities */
 
 	/* Cooldown */
-
 	FGameplayTag Cooldown_Tank_Shoot;
-
+	FGameplayTag Cooldown_Enemy_Shoot;
 	/* End Cooldown */
 
 	/* Actor Type */

@@ -19,6 +19,11 @@ void FTankGameplayTags::InitializeNativeGameplayTags()
 FString("Shoot ability for tanks")
 	);
 
+	GameplayTags.Ability_Enemy_Shoot = Manager.AddNativeGameplayTag(
+	FName("Ability.Enemy.Shoot"),
+FString("Shoot ability for enemies")
+);
+
 	/* End Abilities*/
 
 	/* Cooldown */
@@ -26,6 +31,11 @@ FString("Shoot ability for tanks")
 	GameplayTags.Cooldown_Tank_Shoot = Manager.AddNativeGameplayTag(
 	FName("Cooldown.Tank.Shoot"),
 FString("Shoot ability Cooldown")
+	);
+	
+	GameplayTags.Cooldown_Enemy_Shoot = Manager.AddNativeGameplayTag(
+	FName("Cooldown.Enemy.Shoot"),
+FString("Shoot ability Cooldown for enemies")
 	);
 	
 	/* End Cooldown */
