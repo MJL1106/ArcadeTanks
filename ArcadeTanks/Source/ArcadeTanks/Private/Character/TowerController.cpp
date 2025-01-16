@@ -1,8 +1,7 @@
  // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TowerController.h"
-#include "TankController.h"
+#include "Character/TowerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "Character/PlayerTank.h"
@@ -22,22 +21,23 @@ void ATowerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Tank = Cast<APlayerTank>(UGameplayStatics::GetPlayerPawn(this,0));
+	Tank = Cast<APlayerTank>(UGameplayStatics::GetPlayerPawn(this, 0));
 
-	GetWorldTimerManager().SetTimer(FireRateTimerHandle, this, &ATowerController::CheckFireCondition, FireRate, true);
+	// Instead of your current fire timer, activate the ability
+	GetWorldTimerManager().SetTimer(
+		FireRateTimerHandle, 
+		[this]()
+		{
+			if (UAbilitySystemComponent* ASC = GetAbilitySystemComponent())
+			{
+				FGameplayTagContainer DontCare;
+				ASC->TryActivateAbilitiesByTag(FGameplayTagContainer(FGameplayTag::RequestGameplayTag("Ability.Enemy.Shoot")), true);
+			}
+		}, 
+		FireRate, 
+		true
+	);
 	
-}
-
-void ATowerController::CheckFireCondition()
-{
-	if (Tank == nullptr)
-	{
-		return;
-	}
-	if (InFireRange())
-	{
-		Fire();
-	}
 }
 
 bool ATowerController::InFireRange()

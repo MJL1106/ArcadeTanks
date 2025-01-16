@@ -3,11 +3,8 @@
 
 #include "AbilitySystem/Abilities/ShootAbility.h"
 
-#include "Projectile.h"
+#include "Actor/Projectile.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-
-
 #include "Character/TankCharacterBase.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"

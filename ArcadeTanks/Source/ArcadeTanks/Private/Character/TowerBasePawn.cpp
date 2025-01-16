@@ -1,17 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TankBasePawn.h"
+#include "Character/TowerBasePawn.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Projectile.h"
 #include "AbilitySystem/TankAbilitySystemComponent.h"
 #include "AbilitySystem/TankAttributeSet.h"
+#include "Game/ArcadeTanksGameMode.h"
 #include "Particles/ParticleSystem.h"
 
+class AArcadeTanksGameMode;
 // Sets default values
-ATankBasePawn::ATankBasePawn()
+ATowerBasePawn::ATowerBasePawn()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -31,7 +32,7 @@ ATankBasePawn::ATankBasePawn()
 	AttributeSet = CreateDefaultSubobject<UTankAttributeSet>(TEXT("AttributeSet"));
 }
 
-void ATankBasePawn::BeginPlay()
+void ATowerBasePawn::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -43,7 +44,7 @@ void ATankBasePawn::BeginPlay()
 	}
 }
 
-void ATankBasePawn::InitializeAttributes()
+void ATowerBasePawn::InitializeAttributes()
 {
 	if (AbilitySystemComponent && InitialAttributes)
 	{
@@ -58,7 +59,7 @@ void ATankBasePawn::InitializeAttributes()
 	}
 }
 
-void ATankBasePawn::GiveDefaultAbilities()
+void ATowerBasePawn::GiveDefaultAbilities()
 {
 	UTankAbilitySystemComponent* TurretASC = CastChecked<UTankAbilitySystemComponent>(AbilitySystemComponent);
 	
@@ -69,7 +70,7 @@ void ATankBasePawn::GiveDefaultAbilities()
 }
 
 
-void ATankBasePawn::HandleDestruction()
+void ATowerBasePawn::HandleDestruction()
 {
 	if (DeathParticles)
 	{
@@ -83,10 +84,14 @@ void ATankBasePawn::HandleDestruction()
 	{
 		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(DeathCameraShakeClass);
 	}
+	
+	AArcadeTanksGameMode* ArcadeTanksGameMode = Cast<AArcadeTanksGameMode>(UGameplayStatics::GetGameMode(this));
+	ArcadeTanksGameMode->ActorDied(this);
+	
 	Destroy();
 }
 
-float ATankBasePawn::GetHealth_Implementation() const
+float ATowerBasePawn::GetHealth_Implementation() const
 {
 	if (AttributeSet)
 	{
@@ -95,7 +100,7 @@ float ATankBasePawn::GetHealth_Implementation() const
 	return 0.0f;
 }
 
-float ATankBasePawn::GetMaxHealth_Implementation() const
+float ATowerBasePawn::GetMaxHealth_Implementation() const
 {
 	if (AttributeSet)
 	{
@@ -104,7 +109,7 @@ float ATankBasePawn::GetMaxHealth_Implementation() const
 	return 0.0f;
 }
 
-void ATankBasePawn::RotateTurret(FVector LookAtTarget)
+void ATowerBasePawn::RotateTurret(FVector LookAtTarget)
 {
 	FVector ToTarget = LookAtTarget - TurretMesh->GetComponentLocation();
 	FRotator LookAtRotation = FRotator(0.f, ToTarget.Rotation().Yaw, 0.f);
@@ -116,14 +121,3 @@ void ATankBasePawn::RotateTurret(FVector LookAtTarget)
 			UGameplayStatics::GetWorldDeltaSeconds(this), 
 			5.f));
 }
-
-void ATankBasePawn::Fire()
-{
-	FVector Location = ProjectileSpawnPoint->GetComponentLocation();
-	FRotator Rotation = ProjectileSpawnPoint->GetComponentRotation();
-
-	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, Location, Rotation);
-	Projectile->SetOwner(this);
-	
-}
-

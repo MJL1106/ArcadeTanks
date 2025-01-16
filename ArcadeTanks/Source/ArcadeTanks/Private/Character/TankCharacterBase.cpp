@@ -99,10 +99,8 @@ void ATankCharacterBase::HandleDestruction()
 	}
 	
 	TankBaseMesh->GetAnimInstance()->Montage_Play(DeathMontage, 1.0f);
+	SetActorTickEnabled(false);
 	
-	/*SetActorHiddenInGame(true);
-	SetActorTickEnabled(false);*/
-
 	AArcadeTanksGameMode* ArcadeTanksGameMode = Cast<AArcadeTanksGameMode>(UGameplayStatics::GetGameMode(this));
 	ArcadeTanksGameMode->ActorDied(this);
 }

@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/TankAttributeSet.h"
 
-#include "TankBasePawn.h"
+#include "Character/TowerBasePawn.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 
