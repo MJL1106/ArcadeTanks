@@ -47,18 +47,33 @@ private:
 	TSubclassOf<class UGameplayEffect> DamageEffectClass;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	class UParticleSystem* HitParticles;
-
+	UParticleSystem* HitParticles;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Combat")
-	class UParticleSystemComponent* TrailParticles;
+	UParticleSystemComponent* TrailParticles;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	class USoundBase* LaunchSound;
+	USoundBase* LaunchSound;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	USoundBase* HitSound;
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	TSubclassOf<class UCameraShakeBase> HitCameraShakeClass;
+	TSubclassOf<UCameraShakeBase> HitCameraShakeClass;
+	
+	UPROPERTY()
+	bool bHasBounced = false;
+	
+	UPROPERTY()
+	FTimerHandle DestroyTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
+	float LifeSpan = 10.f;
+	
+	UFUNCTION()
+	void OnLifeSpanExpired();
+
+	void HandleDestruction();
+	
 
 };

@@ -22,8 +22,7 @@ void ATowerController::BeginPlay()
 	Super::BeginPlay();
 
 	Tank = Cast<APlayerTank>(UGameplayStatics::GetPlayerPawn(this, 0));
-
-	// Instead of your current fire timer, activate the ability
+	
 	GetWorldTimerManager().SetTimer(
 		FireRateTimerHandle, 
 		[this]()
@@ -37,7 +36,6 @@ void ATowerController::BeginPlay()
 		FireRate, 
 		true
 	);
-	
 }
 
 bool ATowerController::InFireRange()
