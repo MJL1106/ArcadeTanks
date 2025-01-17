@@ -13,10 +13,8 @@
 #include "Kismet//GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 
-// Sets default values
 AProjectile::AProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
@@ -28,9 +26,11 @@ AProjectile::AProjectile()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement Component"));
 	ProjectileMovementComponent->MaxSpeed = MaxSpeed;
 	ProjectileMovementComponent->InitialSpeed = InitialSpeed;
+	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	ProjectileMovementComponent->bShouldBounce = false;
+	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 }
 
-// Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,9 +41,16 @@ void AProjectile::BeginPlay()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, LaunchSound, GetActorLocation());
 	}
+
+	GetWorld()->GetTimerManager().SetTimer(
+	DestroyTimerHandle,
+	this,
+	&AProjectile::OnLifeSpanExpired,
+	LifeSpan,
+	false
+);
 }
 
-// Called every frame
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -76,20 +83,75 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
                     ASCInterface->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
                 }
             }
+        	HandleDestruction();
         }
-		
-		if (HitParticles)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, GetActorLocation(), GetActorRotation());
-		}
-		if (HitSound)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
-		}
-		if (HitCameraShakeClass)
-		{
-			GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitCameraShakeClass);
-		}
+        else if (!bHasBounced)
+        {
+        	if (Hit.Normal.Z > 0.8f)
+        	{
+        		HandleDestruction();
+        		return;
+        	}
+        	
+        	const FVector CurrentVelocity = ProjectileMovementComponent->Velocity;
+        	const float Speed = CurrentVelocity.Size();
+        	const FVector VelocityDir = CurrentVelocity.GetSafeNormal();
+        	const FVector ReflectionDirection = FMath::GetReflectionVector(VelocityDir, Hit.Normal);
+            
+        	const FVector NewLocation = Hit.Location + (ReflectionDirection * 100.f);
+        	SetActorLocation(NewLocation);
+        	SetActorRotation(ReflectionDirection.Rotation());
+            
+        	UProjectileMovementComponent* NewProjectileMovement = NewObject<UProjectileMovementComponent>(this);
+        	if (NewProjectileMovement)
+        	{
+        		NewProjectileMovement->RegisterComponent();
+        		NewProjectileMovement->bRotationFollowsVelocity = true;
+        		NewProjectileMovement->bShouldBounce = false;
+        		NewProjectileMovement->ProjectileGravityScale = 0.0f;
+        		NewProjectileMovement->SetUpdatedComponent(ProjectileMesh);
+        		NewProjectileMovement->Velocity = ReflectionDirection * Speed;
+                
+        		if (ProjectileMovementComponent)
+        		{
+        			ProjectileMovementComponent->DestroyComponent();
+        		}
+                
+        		ProjectileMovementComponent = NewProjectileMovement;
+        	}
+
+        	bHasBounced = true;
+        }
+        else
+        {
+	        HandleDestruction();
+        }
+	}
+	else
+	{
+		HandleDestruction();
+	}
+}
+
+void AProjectile::OnLifeSpanExpired()
+{
+	HandleDestruction();
+	Destroy();
+}
+
+void AProjectile::HandleDestruction()
+{
+	if (HitParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitParticles, GetActorLocation(), GetActorRotation());
+	}
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, HitSound, GetActorLocation());
+	}
+	if (HitCameraShakeClass)
+	{
+		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitCameraShakeClass);
 	}
 	Destroy();
 }
