@@ -56,7 +56,7 @@ protected:
 private:
 	
 	UFUNCTION()
-	void SpawnProjectile();
+	void SpawnProjectile() const;
 	
 	float GetFireRate(AActor* OwningActor) const;
 };

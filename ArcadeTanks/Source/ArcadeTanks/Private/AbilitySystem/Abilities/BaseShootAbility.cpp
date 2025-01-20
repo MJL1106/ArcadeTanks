@@ -63,7 +63,7 @@ void UBaseShootAbility::ExecuteShootSequence()
 	}
 }
 
-void UBaseShootAbility::SpawnProjectile()
+void UBaseShootAbility::SpawnProjectile() const
 {
     AActor* OwningActor = GetAvatarActorFromActorInfo();
     if (!OwningActor || !ProjectileClass)
@@ -76,7 +76,7 @@ void UBaseShootAbility::SpawnProjectile()
 
     if (const ATankCharacterBase* TankCharacter = Cast<ATankCharacterBase>(OwningActor))
     {
-        USkeletalMeshComponent* BaseMesh = TankCharacter->GetBaseMesh();
+        const USkeletalMeshComponent* BaseMesh = TankCharacter->GetBaseMesh();
         if (!BaseMesh) return;
         
         SocketLocation = BaseMesh->GetSocketLocation(ProjectileSocketName);
@@ -116,7 +116,7 @@ void UBaseShootAbility::SpawnProjectile()
         	const float Damage = Projectile->Damage;
         	Projectile->Damage = Damage * TankBase->GetAttributeSet()->GetDamageMultiplier();
         }
-        else if (ATowerController* TowerBase = Cast<ATowerController>(OwningActor))
+        else if (const ATowerController* TowerBase = Cast<ATowerController>(OwningActor))
         {
             Projectile->ProjectileMovementComponent->MaxSpeed = TowerBase->MaxBulletSpeed;
             Projectile->ProjectileMovementComponent->InitialSpeed = TowerBase->InitialBulletSpeed;
@@ -131,7 +131,7 @@ float UBaseShootAbility::GetFireRate(AActor* OwningActor) const
 	if (const ATankCharacterBase* Character = Cast<ATankCharacterBase>(OwningActor))
 	{
 		float BaseCooldownDuration = Character->FireRate;
-		if (UTankAttributeSet* AttributeSet = Character->GetAttributeSet())
+		if (const UTankAttributeSet* AttributeSet = Character->GetAttributeSet())
 		{
 			const float FireRateMultiplier = AttributeSet->GetFireRateMultiplier();
 			const float NewDuration = BaseCooldownDuration / FireRateMultiplier;
