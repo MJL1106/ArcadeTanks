@@ -15,17 +15,20 @@ AEffectPickupBase::AEffectPickupBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	// Setup collision
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	RootComponent = CollisionComponent;
+	CollisionComponent->SetupAttachment(RootComponent);
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAll"));
 	CollisionComponent->SetSphereRadius(100.0f);
-	CollisionComponent->SetMobility(EComponentMobility::Movable);
 
+	// Setup mesh
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	MeshComponent->SetupAttachment(RootComponent);
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshComponent->Mobility = EComponentMobility::Movable;
-	
+    
+	// Default values for movement
 	EffectDuration = 10.0f;
 	bShouldRotate = true;
 	RotationRate = 180.0f;
@@ -38,35 +41,46 @@ void AEffectPickupBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AEffectPickupBase::OnOverlapBegin);
 	InitialLocation = GetActorLocation();
 	RunningTime = 0.0f;
+
+	// Setup overlap
+	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AEffectPickupBase::OnOverlapBegin);
 }
 
 void AEffectPickupBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//UpdatePickupMovement(DeltaTime);
+	UpdatePickupMovement(DeltaTime);
 }
 
 void AEffectPickupBase::UpdatePickupMovement(float DeltaTime)
 {
+	if (!bShouldRotate && !bShouldFloat)
+	{
+		return;
+	}
+
 	RunningTime += DeltaTime;
 
+	FVector NewLocation = InitialLocation;
+	FRotator NewRotation = GetActorRotation();
+
+	// Handle rotation
 	if (bShouldRotate)
 	{
-		FRotator NewRotation = GetActorRotation();
-		NewRotation.Yaw += RotationRate * DeltaTime;
-		SetActorRotation(NewRotation);
+		NewRotation.Yaw = FMath::Fmod(NewRotation.Yaw + (RotationRate * DeltaTime), 360.0f);
 	}
 
+	// Handle floating
 	if (bShouldFloat)
 	{
-		FVector NewLocation = InitialLocation;
-		NewLocation.Z += FMath::Sin(RunningTime * FloatSpeed) * FloatHeight;
-		SetActorLocation(NewLocation);
+		NewLocation.Z = InitialLocation.Z + (FMath::Sin(RunningTime * FloatSpeed) * FloatHeight);
 	}
+
+	// Update the actor's transform
+	SetActorLocationAndRotation(NewLocation, NewRotation);
 }
 
 void AEffectPickupBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
