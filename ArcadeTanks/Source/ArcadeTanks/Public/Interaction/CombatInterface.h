@@ -24,6 +24,7 @@ class ARCADETANKS_API ICombatInterface
 public:
 	
 	virtual void HandleDestruction() = 0;
+	virtual void UpdateMovementSpeed(const float SpeedMultiplier) {}
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Combat")
 	float GetHealth() const;

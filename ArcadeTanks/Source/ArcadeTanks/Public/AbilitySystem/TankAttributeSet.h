@@ -14,6 +14,8 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+class ATankCharacterBase;
+
 UCLASS()
 class ARCADETANKS_API UTankAttributeSet : public UAttributeSet
 {
@@ -24,6 +26,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 
 	// Health
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_Health)
@@ -39,6 +42,19 @@ public:
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS(UTankAttributeSet, Armor)
 
+	// Fire Rate Multiplier
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_FireRateMultiplier)
+	FGameplayAttributeData FireRateMultiplier;
+	ATTRIBUTE_ACCESSORS(UTankAttributeSet, FireRateMultiplier)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_MovementSpeedMultiplier)
+	FGameplayAttributeData MovementSpeedMultiplier;
+	ATTRIBUTE_ACCESSORS(UTankAttributeSet, MovementSpeedMultiplier)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_DamageMultiplier)
+	FGameplayAttributeData DamageMultiplier;
+	ATTRIBUTE_ACCESSORS(UTankAttributeSet, DamageMultiplier)
+	
 protected:
 	// Rep notifies
 	UFUNCTION()
@@ -49,4 +65,13 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_Armor(const FGameplayAttributeData& OldArmor);
+
+	UFUNCTION()
+	virtual void OnRep_FireRateMultiplier(const FGameplayAttributeData& OldFireRateMultiplier);
+
+	UFUNCTION()
+	virtual void OnRep_MovementSpeedMultiplier(const FGameplayAttributeData& OldMovementSpeedMultiplier);
+
+	UFUNCTION()
+	virtual void OnRep_DamageMultiplier(const FGameplayAttributeData& OldDamageMultiplier);
 };

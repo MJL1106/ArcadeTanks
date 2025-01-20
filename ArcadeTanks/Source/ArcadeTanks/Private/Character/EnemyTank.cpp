@@ -8,7 +8,7 @@ AEnemyTank::AEnemyTank()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	MovementSpeed = 125.0f;
-	TurnRate = 20.0f; 
+	CurrentTurnRate = 20.0f; 
 }
 
 void AEnemyTank::BeginPlay()

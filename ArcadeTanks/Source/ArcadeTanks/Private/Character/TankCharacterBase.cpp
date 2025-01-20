@@ -24,8 +24,10 @@ ATankCharacterBase::ATankCharacterBase()
 	if (Movement)
 	{
 		Movement->bOrientRotationToMovement = false;
-		Movement->MaxWalkSpeed = MovementSpeed;
+		Movement->MaxWalkSpeed = MovementSpeed * AttributeSet->GetMovementSpeedMultiplier();
 	}
+
+	CurrentTurnRate = BaseTurnRate;
 }
 
 void ATankCharacterBase::PossessedBy(AController* NewController)
@@ -51,7 +53,7 @@ void ATankCharacterBase::OnRep_PlayerState()
 	}
 }
 
-void ATankCharacterBase::InitializeAttributes()
+void ATankCharacterBase::InitializeAttributes() const
 {
 	if (AbilitySystemComponent && DefaultAttributeEffect)
 	{
@@ -66,7 +68,7 @@ void ATankCharacterBase::InitializeAttributes()
 	}
 }
 
-void ATankCharacterBase::GiveDefaultAbilities()
+void ATankCharacterBase::GiveDefaultAbilities() const
 {
 	UTankAbilitySystemComponent* TankASC = CastChecked<UTankAbilitySystemComponent>(AbilitySystemComponent);
 	
@@ -103,6 +105,16 @@ void ATankCharacterBase::HandleDestruction()
 	
 	AArcadeTanksGameMode* ArcadeTanksGameMode = Cast<AArcadeTanksGameMode>(UGameplayStatics::GetGameMode(this));
 	ArcadeTanksGameMode->ActorDied(this);
+}
+
+void ATankCharacterBase::UpdateMovementSpeed(const float SpeedMultiplier)
+{
+	if (Movement)
+	{
+		const float NewSpeed = MovementSpeed * SpeedMultiplier;
+		Movement->MaxWalkSpeed = NewSpeed;
+		CurrentTurnRate = BaseTurnRate * SpeedMultiplier;
+	}
 }
 
 float ATankCharacterBase::GetHealth_Implementation() const

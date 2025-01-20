@@ -11,6 +11,7 @@
 #include "InputActionValue.h"
 #include "TankGameplayTags.h"
 #include "AbilitySystem/TankAbilitySystemComponent.h"
+#include "AbilitySystem/TankAttributeSet.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
 
