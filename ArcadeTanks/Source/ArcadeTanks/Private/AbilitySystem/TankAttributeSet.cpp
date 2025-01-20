@@ -47,7 +47,6 @@ void UTankAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	}
 	else if (Data.EvaluatedData.Attribute == GetFireRateMultiplierAttribute())
 	{
-		const float OldFireRate = GetFireRateMultiplier();
 		const float NewFireRateMultiplier = FMath::Max(GetFireRateMultiplier(), 0.1f);
 		SetFireRateMultiplier(NewFireRateMultiplier);
 	}

@@ -153,6 +153,16 @@ void AEffectPickupBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	FActiveGameplayEffectHandle ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	if (ActiveHandle.WasSuccessfullyApplied())
 	{
+		const UTankAttributeSet* Attributes = Cast<UTankAttributeSet>(ASC->GetAttributeSet(UTankAttributeSet::StaticClass()));
+		if (Attributes)
+		{
+			float CurrentHealth = Attributes->GetHealth();
+        
+			// Optional: Print to screen for easier debugging
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, 
+				FString::Printf(TEXT("New Health Value: %f"), CurrentHealth));
+		}
+		
 		if (PickupVFX)
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
