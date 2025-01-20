@@ -15,6 +15,7 @@ UTankAttributeSet::UTankAttributeSet()
 	InitHealth(60.0f);
 	InitMaxHealth(60.0f);
 	InitArmor(50.0f);
+	InitFireRateMultiplier(1.0f);
 }
 
 void UTankAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -24,6 +25,7 @@ void UTankAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, Armor, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, FireRateMultiplier, COND_None, REPNOTIFY_Always);
 }
 
 void UTankAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -43,6 +45,12 @@ void UTankAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			}
 		}
 	}
+	else if (Data.EvaluatedData.Attribute == GetFireRateMultiplierAttribute())
+	{
+		const float OldFireRate = GetFireRateMultiplier();
+		const float NewFireRateMultiplier = FMath::Max(GetFireRateMultiplier(), 0.1f);
+		SetFireRateMultiplier(NewFireRateMultiplier);
+	}
 }
 
 void UTankAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
@@ -58,4 +66,9 @@ void UTankAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHeal
 void UTankAttributeSet::OnRep_Armor(const FGameplayAttributeData& OldArmor)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTankAttributeSet, Armor, OldArmor);
+}
+
+void UTankAttributeSet::OnRep_FireRateMultiplier(const FGameplayAttributeData& OldFireRateMultiplier)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTankAttributeSet, FireRateMultiplier, OldFireRateMultiplier);
 }

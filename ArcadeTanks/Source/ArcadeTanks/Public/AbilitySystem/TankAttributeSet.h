@@ -39,6 +39,11 @@ public:
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS(UTankAttributeSet, Armor)
 
+	// Fire Rate Multiplier
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_FireRateMultiplier)
+	FGameplayAttributeData FireRateMultiplier;
+	ATTRIBUTE_ACCESSORS(UTankAttributeSet, FireRateMultiplier)
+
 protected:
 	// Rep notifies
 	UFUNCTION()
@@ -49,4 +54,7 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_Armor(const FGameplayAttributeData& OldArmor);
+
+	UFUNCTION()
+	virtual void OnRep_FireRateMultiplier(const FGameplayAttributeData& OldFireRateMultiplier);
 };

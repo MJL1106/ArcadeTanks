@@ -4,7 +4,7 @@
 #include "AbilitySystem/TankAbilitySystemComponent.h"
 
 #include "TankGameplayTags.h"
-#include "AbilitySystem/Abilities/TankGameplayAbility.h"
+#include "AbilitySystem/Abilities/BaseShootAbility.h"
 
 UTankAbilitySystemComponent::UTankAbilitySystemComponent()
 {
@@ -28,9 +28,8 @@ void UTankAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-		if (const UTankGameplayAbility* TankAbility = Cast<UTankGameplayAbility>(AbilitySpec.Ability))
+		if (const UBaseShootAbility* TankAbility = Cast<UBaseShootAbility>(AbilitySpec.Ability))
 		{
-			AbilitySpec.DynamicAbilityTags.AddTag(TankAbility->StartupInputTag);
 			GiveAbility(AbilitySpec);
 		}
 	}
