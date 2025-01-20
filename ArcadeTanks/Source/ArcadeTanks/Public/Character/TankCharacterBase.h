@@ -31,6 +31,7 @@ public:
 
 	// Combat Interface
 	virtual void HandleDestruction() override;
+	virtual void UpdateMovementSpeed(const float SpeedMultiplier) override;
 	virtual float GetHealth_Implementation() const override;
 	virtual float GetMaxHealth_Implementation() const override;
 
@@ -42,7 +43,10 @@ public:
 	float MovementSpeed = 200.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	float TurnRate = 45.0f;
+	float BaseTurnRate = 45.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float CurrentTurnRate = 45.0f;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Tank")
 	FRotator TurretTargetRotation;
@@ -75,7 +79,7 @@ public:
 
 	// Getter functions for movement properties
 	float GetMovementSpeed() const { return MovementSpeed; }
-	float GetTurnRate() const { return TurnRate; }
+	float GetTurnRate() const { return CurrentTurnRate; }
 	USkeletalMeshComponent* GetBaseMesh() const { return TankBaseMesh; }
 	FRotator GetTurretRotation(const FVector& TargetLocation) const;
 	
@@ -85,20 +89,20 @@ protected:
 	virtual void OnRep_PlayerState() override;
 
 	UPROPERTY()
-	class UTankAttributeSet* AttributeSet;
+	UTankAttributeSet* AttributeSet;
 
 	// Default abilities for tanks
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TArray<TSubclassOf<class UGameplayAbility>> DefaultAbilities;
+	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
 
 	// Effect to apply on spawn
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TSubclassOf<class UGameplayEffect> DefaultAttributeEffect;
+	TSubclassOf<UGameplayEffect> DefaultAttributeEffect;
 
 	FName TurretBoneName = "BoneTurret";
 
 private:
-	void InitializeAttributes();
-	void GiveDefaultAbilities();
+	void InitializeAttributes() const;
+	void GiveDefaultAbilities() const;
 
 };
