@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "NiagaraSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "EffectPickupBase.generated.h"
 
 class UGameplayEffect;
@@ -53,6 +54,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	USoundBase* PickupSFX;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UParticleSystemComponent* ParticleSystemComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	float FadeOutDuration;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	UParticleSystem* PickupParticleSystem;
+
 	// Movement properties
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	bool bShouldRotate;
@@ -74,4 +84,11 @@ private:
 	float RunningTime;
     
 	void UpdatePickupMovement(float DeltaTime);
+	void UpdateDestroyEffect(float DeltaTime);
+
+	float DestroyTimer;
+	bool bIsBeingDestroyed;
+	float DestroyDuration;
+	FVector OriginalScale;
+	float OriginalParticleAlpha;
 };

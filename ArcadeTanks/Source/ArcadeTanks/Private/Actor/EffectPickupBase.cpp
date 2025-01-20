@@ -17,24 +17,25 @@ AEffectPickupBase::AEffectPickupBase()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
-	// Setup collision
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 	CollisionComponent->SetupAttachment(RootComponent);
 	CollisionComponent->SetCollisionProfileName(TEXT("OverlapAll"));
 	CollisionComponent->SetSphereRadius(100.0f);
 
-	// Setup mesh
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
-	MeshComponent->SetupAttachment(RootComponent);
-	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    
-	// Default values for movement
+	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystemComponent"));
+	ParticleSystemComponent->SetupAttachment(RootComponent);
+	ParticleSystemComponent->bAutoActivate = true;
+
 	EffectDuration = 10.0f;
 	bShouldRotate = true;
 	RotationRate = 180.0f;
 	bShouldFloat = true;
 	FloatHeight = 50.0f;
 	FloatSpeed = 2.0f;
+
+	FadeOutDuration = 1.0f;
+	bIsBeingDestroyed = false;
+	DestroyTimer = 0.0f;
 }
 
 void AEffectPickupBase::BeginPlay()
@@ -44,15 +45,25 @@ void AEffectPickupBase::BeginPlay()
 	InitialLocation = GetActorLocation();
 	RunningTime = 0.0f;
 
-	// Setup overlap
 	CollisionComponent->OnComponentBeginOverlap.AddDynamic(this, &AEffectPickupBase::OnOverlapBegin);
+
+	if (PickupParticleSystem)
+	{
+		ParticleSystemComponent->SetTemplate(PickupParticleSystem);
+	}
+
+	OriginalScale = GetActorScale3D();
 }
 
 void AEffectPickupBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdatePickupMovement(DeltaTime);
+	//UpdatePickupMovement(DeltaTime);
+	if (bIsBeingDestroyed)
+	{
+		UpdateDestroyEffect(DeltaTime);
+	}
 }
 
 void AEffectPickupBase::UpdatePickupMovement(float DeltaTime)
@@ -67,20 +78,38 @@ void AEffectPickupBase::UpdatePickupMovement(float DeltaTime)
 	FVector NewLocation = InitialLocation;
 	FRotator NewRotation = GetActorRotation();
 
-	// Handle rotation
 	if (bShouldRotate)
 	{
 		NewRotation.Yaw = FMath::Fmod(NewRotation.Yaw + (RotationRate * DeltaTime), 360.0f);
 	}
 
-	// Handle floating
 	if (bShouldFloat)
 	{
 		NewLocation.Z = InitialLocation.Z + (FMath::Sin(RunningTime * FloatSpeed) * FloatHeight);
 	}
 
-	// Update the actor's transform
 	SetActorLocationAndRotation(NewLocation, NewRotation);
+}
+
+void AEffectPickupBase::UpdateDestroyEffect(float DeltaTime)
+{
+	DestroyTimer += DeltaTime;
+	float Alpha = FMath::Clamp(DestroyTimer / FadeOutDuration, 0.0f, 1.0f);
+
+	float InverseAlpha = 1.0f - Alpha;
+
+	FVector NewScale = OriginalScale * InverseAlpha;
+	SetActorScale3D(NewScale);
+	
+	if (ParticleSystemComponent)
+	{
+		ParticleSystemComponent->SetColorParameter(FName("Color"), 
+			FLinearColor(1.0f, 1.0f, 1.0f, InverseAlpha));
+	}
+	if (Alpha >= 1.0f)
+	{
+		Destroy();
+	}
 }
 
 void AEffectPickupBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
@@ -91,64 +120,61 @@ void AEffectPickupBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	const FHitResult& SweepResult)
 {
 
-    if (!OtherActor)
-    {
-        return;
-    }
+	if (!OtherActor || bIsBeingDestroyed)
+	{
+		return;
+	}
 
-    ATankCharacterBase* Tank = Cast<ATankCharacterBase>(OtherActor);
-    if (!Tank)
-    {
-        return;
-    }
+	ATankCharacterBase* Tank = Cast<ATankCharacterBase>(OtherActor);
+	if (!Tank)
+	{
+		return;
+	}
 
-    UAbilitySystemComponent* ASC = Tank->GetAbilitySystemComponent();
-    if (!ASC)
-    {
-        return;
-    }
+	UAbilitySystemComponent* ASC = Tank->GetAbilitySystemComponent();
+	if (!ASC || !EffectClass)
+	{
+		return;
+	}
 
-    if (!EffectClass)
-    {
-        return;
-    }
-	
-    FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
-    FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(EffectClass, 1.0f, EffectContext);
+	FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(EffectClass, 1.0f, EffectContext);
     
-    if (!SpecHandle.IsValid())
-    {
-        return;
-    }
+	if (!SpecHandle.IsValid())
+	{
+		return;
+	}
 
-    if (EffectDuration > 0.0f)
-    {
-        SpecHandle.Data.Get()->SetDuration(EffectDuration, true);
-    }
+	if (EffectDuration > 0.0f)
+	{
+		SpecHandle.Data.Get()->SetDuration(EffectDuration, true);
+	}
 
-    FActiveGameplayEffectHandle ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-    if (ActiveHandle.WasSuccessfullyApplied())
-    {
-    	if (PickupVFX)
-    	{
-    		UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+	FActiveGameplayEffectHandle ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	if (ActiveHandle.WasSuccessfullyApplied())
+	{
+		if (PickupVFX)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 				GetWorld(),
 				PickupVFX,
 				GetActorLocation(),
 				GetActorRotation()
 			);
-    	}
+		}
 
-    	if (PickupSFX)
-    	{
-    		UGameplayStatics::PlaySoundAtLocation(
+		if (PickupSFX)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
 				this,
 				PickupSFX,
 				GetActorLocation()
 			);
-    	}
+		}
+		bIsBeingDestroyed = true;
+		DestroyTimer = 0.0f;
 
-    	Destroy();
-    }
+		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
