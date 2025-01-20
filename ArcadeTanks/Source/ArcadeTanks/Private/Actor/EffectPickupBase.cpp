@@ -153,22 +153,6 @@ void AEffectPickupBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 	FActiveGameplayEffectHandle ActiveHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	if (ActiveHandle.WasSuccessfullyApplied())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, 
-		TEXT("Effect Successfully Applied"));
-        
-		const UTankAttributeSet* Attributes = Cast<UTankAttributeSet>(ASC->GetAttributeSet(UTankAttributeSet::StaticClass()));
-		if (Attributes)
-		{
-			float CurrentSpeed = Attributes->GetMovementSpeedMultiplier();
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, 
-				FString::Printf(TEXT("Speed Multiplier: %f"), CurrentSpeed));
-		}
-		else 
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, 
-				TEXT("Failed to get AttributeSet"));
-		}
-		
 		if (PickupVFX)
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(

@@ -112,6 +112,9 @@ void UBaseShootAbility::SpawnProjectile()
         {
             Projectile->ProjectileMovementComponent->MaxSpeed = TankBase->MaxBulletSpeed;
             Projectile->ProjectileMovementComponent->InitialSpeed = TankBase->InitialBulletSpeed;
+        	
+        	const float Damage = Projectile->Damage;
+        	Projectile->Damage = Damage * TankBase->GetAttributeSet()->GetDamageMultiplier();
         }
         else if (ATowerController* TowerBase = Cast<ATowerController>(OwningActor))
         {

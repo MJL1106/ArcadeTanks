@@ -50,6 +50,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_MovementSpeedMultiplier)
 	FGameplayAttributeData MovementSpeedMultiplier;
 	ATTRIBUTE_ACCESSORS(UTankAttributeSet, MovementSpeedMultiplier)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_DamageMultiplier)
+	FGameplayAttributeData DamageMultiplier;
+	ATTRIBUTE_ACCESSORS(UTankAttributeSet, DamageMultiplier)
 	
 protected:
 	// Rep notifies
@@ -67,4 +71,7 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_MovementSpeedMultiplier(const FGameplayAttributeData& OldMovementSpeedMultiplier);
+
+	UFUNCTION()
+	virtual void OnRep_DamageMultiplier(const FGameplayAttributeData& OldDamageMultiplier);
 };

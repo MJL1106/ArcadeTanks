@@ -19,6 +19,7 @@ UTankAttributeSet::UTankAttributeSet()
 	InitArmor(50.0f);
 	InitFireRateMultiplier(1.0f);
 	InitMovementSpeedMultiplier(1.0f);
+	InitDamageMultiplier(1.0f);
 }
 
 void UTankAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -30,6 +31,7 @@ void UTankAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, Armor, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, FireRateMultiplier, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, MovementSpeedMultiplier, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UTankAttributeSet, DamageMultiplier, COND_None, REPNOTIFY_Always);
 }
 
 void UTankAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -67,6 +69,10 @@ void UTankAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		const float NewFireRateMultiplier = FMath::Max(GetFireRateMultiplier(), 0.1f);
 		SetFireRateMultiplier(NewFireRateMultiplier);
 	}
+	else if (Data.EvaluatedData.Attribute == GetDamageMultiplierAttribute())
+	{
+		SetDamageMultiplier(GetDamageMultiplier());
+	}
 }
 
 
@@ -93,4 +99,9 @@ void UTankAttributeSet::OnRep_FireRateMultiplier(const FGameplayAttributeData& O
 void UTankAttributeSet::OnRep_MovementSpeedMultiplier(const FGameplayAttributeData& OldMovementSpeedMultiplier)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UTankAttributeSet, MovementSpeedMultiplier, OldMovementSpeedMultiplier);
+}
+
+void UTankAttributeSet::OnRep_DamageMultiplier(const FGameplayAttributeData& OldDamageMultiplier)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UTankAttributeSet, DamageMultiplier, OldDamageMultiplier);
 }
